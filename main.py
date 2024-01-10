@@ -85,4 +85,14 @@ class TicTacToe:
                 self.pole[i][j].value = 0
         self._win = 0
 
+    def show(self):
+        """Функция отображение текущего состояния игрового поля"""
+        for row in self.pole:
+            print(*map(lambda x: '#' if x.value == 0 else x.value, row))
+        print('--------------------------------')
+
+
+
+
+
 
