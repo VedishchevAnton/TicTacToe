@@ -23,7 +23,7 @@ class TicTacToe:
 
     def __check_index(self, index):
         """
-        Функция проверка: Если индексы указаны неверно
+        Метод проверка: Если индексы указаны неверно
         (не целые числа или числа, выходящие за диапазон [0; 2]), то следует генерировать исключение
          """
         if type(index) not in (tuple, list) or len(index) != 2:
@@ -33,7 +33,7 @@ class TicTacToe:
             raise IndexError('некорректно указанные индексы')
 
     def __update_win_status(self):
-        """Функция проверки статуса игры"""
+        """Метод проверки статуса игры"""
         for row in self.pole:  # проверка в строках
             if all(x.value == self.HUMAN_X for x in row):
                 self._win = 1
@@ -79,18 +79,30 @@ class TicTacToe:
         self.__update_win_status()
 
     def init(self):
-        """Функция очистки игрового поля"""
+        """Метод очистки игрового поля"""
         for i in range(self._size):
             for j in range(self._size):
                 self.pole[i][j].value = 0
         self._win = 0
 
     def show(self):
-        """Функция отображение текущего состояния игрового поля"""
+        """Метод отображение текущего состояния игрового поля"""
         for row in self.pole:
             print(*map(lambda x: '#' if x.value == 0 else x.value, row))
         print('--------------------------------')
 
+    def human_go(self):
+        """Метод реализации хода игрока"""
+        if not self:
+            return  # bool(game) - возвращает False, если игра окончена
+
+        while True:
+            i, j = map(int, input('Введите координаты клетки: ').split())
+            if not (0 <= i < self._size) or (0 <= j < self._size):
+                continue
+            if self.pole[i][j].value == self.FREE_CELL:
+                self.pole[i][j].value = self.HUMAN_X
+                break
 
 
 
