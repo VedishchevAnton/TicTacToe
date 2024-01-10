@@ -77,3 +77,12 @@ class TicTacToe:
         r, c = key
         self.pole[r][c].value = value
         self.__update_win_status()
+
+    def init(self):
+        """Функция очистки игрового поля"""
+        for i in range(self._size):
+            for j in range(self._size):
+                self.pole[i][j].value = 0
+        self._win = 0
+
+
