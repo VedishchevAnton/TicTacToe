@@ -104,7 +104,18 @@ class TicTacToe:
                 self.pole[i][j].value = self.HUMAN_X
                 break
 
+    def computer_go(self):
+        """Метод реализации хода компьютера"""
+        if not self:
+            return  # bool(game) - возвращает False, если игра окончена
 
+        while True:
+            i = randint(0, self._size - 1)
+            j = randint(0, self._size - 1)
+            if self.pole[i][j].value != self.FREE_CELL:
+                continue
+            self.pole[i][j].value = self.COMPUTER_O
+            break
 
 
 
