@@ -18,6 +18,18 @@ class TicTacToe:
         self.pole = tuple(
             tuple(Cell() for _ in range(self._size)) for _ in range(self._size))  # двумерный кортеж, размером 3x3.
 
+    def __check_index(self, index):
+        """
+        Функция проверка: Если индексы указаны неверно
+        (не целые числа или числа, выходящие за диапазон [0; 2]), то следует генерировать исключение
+         """
+        if type(index) not in (tuple, list) or len(index) != 2:
+            raise IndexError('некорректно указанные индексы')
+        r, c = index
+        if not (0 <= r < self._size) or (0 <= c < self._size):
+            raise IndexError('некорректно указанные индексы')
+
+
 
 
 
