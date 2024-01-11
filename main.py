@@ -1,121 +1,208 @@
-from random import randint
+import random
 
 
 class Cell:
     def __init__(self):
-        self.value = 0  # value - текущее значение в ячейке: 0 - клетка свободна; 1 - стоит крестик; 2 - стоит нолик.
+        self.value = 0
 
     def __bool__(self):
-        return self.value == 0  # bool(cell) - возвращает True,
-        # если клетка свободна (value = 0) и False - в противном случае.
+        return self.value == 0
 
 
 class TicTacToe:
     FREE_CELL = 0  # свободная клетка
     HUMAN_X = 1  # крестик (игрок - человек)
-    COMPUTER_O = 2  # нолик (игрок - компьютер)
+    COMPUTER_O = 2
 
     def __init__(self):
-        self._size = 3
-        self._win = 0  # 0 - игра, 1 - победа человека, 2 - победа компьютера, 3 - ничья
-        self.pole = tuple(
-            tuple(Cell() for _ in range(self._size)) for _ in range(self._size))  # двумерный кортеж, размером 3x3.
-
-    def __check_index(self, index):
-        """
-        Метод проверка: Если индексы указаны неверно
-        (не целые числа или числа, выходящие за диапазон [0; 2]), то следует генерировать исключение
-         """
-        if type(index) not in (tuple, list) or len(index) != 2:
-            raise IndexError('некорректно указанные индексы')
-        r, c = index  # распаковка
-        if not (0 <= r < self._size) or (0 <= c < self._size):
-            raise IndexError('некорректно указанные индексы')
-
-    def __update_win_status(self):
-        """Метод проверки статуса игры"""
-        for row in self.pole:  # проверка в строках
-            if all(x.value == self.HUMAN_X for x in row):
-                self._win = 1
-                return
-            if all(x.value == self.COMPUTER_O for x in row):
-                self._win = 2
-                return
-
-        for i in range(self._size):  # проверка в столбцах
-            if all(x.value == self.HUMAN_X for x in (row[i] for row in self.pole)):
-                self._win = 1
-                return
-
-            if all(x.value == self.COMPUTER_O for x in (row[i] for row in self.pole)):
-                self._win = 2
-                return
-
-        # проверка в диагоналях
-        if all(self.pole[i][i].value == self.HUMAN_X for i in range(self._size)) or \
-                all(self.pole[i][-1 - i].value == self.HUMAN_X for i in range(self._size)):
-            self._win = 1
-            return
-
-        if all(self.pole[i][i].value == self.COMPUTER_O for i in range(self._size)) or \
-                all(self.pole[i][-1 - i].value == self.COMPUTER_O for i in range(self._size)):
-            self._win = 2
-            return
-
-        # проверка ничьи
-        if all(x.value != self.FREE_CELL for row in self.pole for x in row):
-            self._win = 3
-            return
-
-    def __getitem__(self, item):
-        self.__check_index(item)
-        r, c = item  # распаковка
-        return self.pole[r][c].value
-
-    def __setitem__(self, key, value):
-        self.__check_index(key)
-        r, c = key
-        self.pole[r][c].value = value
-        self.__update_win_status()
+        self.__n = 3
+        self.pole = tuple(tuple(Cell() for _ in range(self.__n)) for _ in range(self.__n))
+        self.__is_human_win = False
+        self.__is_computer_win = False
+        self.__is_draw = False
 
     def init(self):
-        """Метод очистки игрового поля"""
-        for i in range(self._size):
-            for j in range(self._size):
-                self.pole[i][j].value = 0
-        self._win = 0
+        self.clear()
+
+    def clear(self):
+        for row in self.pole:
+            for cell in row:
+                cell.value = 0
+        self.__is_human_win = False
+        self.__is_computer_win = False
+        self.__is_draw = False
+
+    def __check(self, item):
+        if type(item) != tuple or len(item) != 2:
+            raise IndexError('неверный индекс клетки')
+        for i in item:
+            if not isinstance(i, int) or i < 0 or i > 2:
+                raise IndexError('неверный индекс клетки')
+
+    @property
+    def is_human_win(self):
+        return self.__is_human_win
+
+    @is_human_win.setter
+    def is_human_win(self, value):
+        self.__is_human_win = value
+
+    def __human_win_method(self):
+        for i in range(self.__n):
+            j = 0
+            m = 0
+            while j < self.__n:
+                if self.pole[i][j].value == self.HUMAN_X:
+                    m += 1
+                j += 1
+            if m == 3:
+                return True
+            j = 0
+            n = 0
+            while j < self.__n:
+                if self.pole[j][i].value == self.HUMAN_X:
+                    n += 1
+                j += 1
+            if n == 3:
+                return True
+        s = 0
+        for k in range(self.__n):
+            if self.pole[k][k].value == self.HUMAN_X:
+                s += 1
+        if s == 3:
+            return True
+
+        return False
+
+    @property
+    def is_computer_win(self):
+        return self.__is_computer_win
+
+    @is_computer_win.setter
+    def is_computer_win(self, value):
+        self.__is_computer_win = value
+
+    def __computer_win_method(self):
+        for i in range(self.__n):
+            j = 0
+            m = 0
+            while j < self.__n:
+                if self.pole[i][j].value == self.COMPUTER_O:
+                    m += 1
+                j += 1
+            if m == 3:
+                return True
+            j = 0
+            n = 0
+            while j < self.__n:
+                if self.pole[j][i].value == self.COMPUTER_O:
+                    n += 1
+                j += 1
+            if n == 3:
+                return True
+        s = 0
+        for k in range(self.__n):
+            if self.pole[k][k].value == self.COMPUTER_O:
+                s += 1
+        if s == 3:
+            return True
+
+        return False
+
+    @property
+    def is_draw(self):
+        return self.__is_draw
+
+    @is_draw.setter
+    def is_draw(self, value):
+        self.__is_draw = value
+
+    def __draw_method(self):
+        m = 0
+        for i in range(self.__n):
+            for j in range(self.__n):
+                item = i, j
+                if self.pole[i][j].value != self.FREE_CELL:
+                    m += 1
+        if m == self.__n ** 2:
+            return True
+        return False
+
+    def __setitem__(self, key, value):
+        self.__check(key)
+        r, c = key
+        if self.pole[r][c]:
+            self.pole[r][c].value = value
+        if self.__human_win_method():
+            self.__is_human_win = True
+        if self.__computer_win_method():
+            self.__is_computer_win = True
+        if self.__draw_method():
+            self.__is_draw = True
+
+    def __getitem__(self, item):
+        r, c = item
+        return self.pole[r][c].value
 
     def show(self):
-        """Метод отображение текущего состояния игрового поля"""
-        for row in self.pole:
-            print(*map(lambda x: '#' if x.value == 0 else x.value, row))
-        print('--------------------------------')
+        for k in range(self.__n):
+            print([i.value for i in self.pole[k]])
 
     def human_go(self):
-        """Метод реализации хода игрока"""
-        if not self:
-            return  # bool(game) - возвращает False, если игра окончена
-
-        while True:
-            i, j = map(int, input('Введите координаты клетки: ').split())
-            if not (0 <= i < self._size) or (0 <= j < self._size):
-                continue
-            if self.pole[i][j].value == self.FREE_CELL:
-                self.pole[i][j].value = self.HUMAN_X
-                break
+        coords = [int(i) for i in input().split()]
+        item = coords[0], coords[1]
+        self.__check(item)
+        if self.__getitem__(item) == self.FREE_CELL:
+            self.__setitem__(item, self.HUMAN_X)
+        else:
+            raise ValueError('клетка уже занята')
 
     def computer_go(self):
-        """Метод реализации хода компьютера"""
-        if not self:
-            return  # bool(game) - возвращает False, если игра окончена
+        flag = True
+        while flag:
+            i, j = random.randint(0, self.__n - 1), random.randint(0, self.__n - 1)
+            item = i, j
+            if self.pole[i][j].value == self.FREE_CELL:
+                self.__setitem__(item, self.COMPUTER_O)
+                flag = False
 
-        while True:
-            i = randint(0, self._size - 1)
-            j = randint(0, self._size - 1)
-            if self.pole[i][j].value != self.FREE_CELL:
-                continue
-            self.pole[i][j].value = self.COMPUTER_O
-            break
+    def __end(self):
+        flag = False
+        if self.__human_win_method():
+            self.__is_human_win = True
+            flag = True
+
+        if self.__computer_win_method():
+            self.__is_computer_win = True
+            flag = True
+
+        if self.__draw_method():
+            self.__is_draw = True
+            flag = True
+        return flag
+
+    def __bool__(self):
+        return not self.__end()
 
 
+game = TicTacToe()
+game.init()
+step_game = 0
+while game:
+    game.show()
 
+    if step_game % 2 == 0:
+        game.human_go()
+    else:
+        game.computer_go()
+
+    step_game += 1
+
+game.show()
+
+if game.is_human_win:
+    print("Поздравляем! Вы победили!")
+elif game.is_computer_win:
+    print("Все получится, со временем")
+else:
+    print("Ничья.")
