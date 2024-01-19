@@ -6,7 +6,7 @@ from cell import Cell
 class TicTacToe:
     FREE_CELL = 0  # свободная клетка
     HUMAN_X = 1  # крестик (игрок - человек)
-    COMPUTER_O = 2  # нолик (игрок - компьютер)
+    COMPUTER_O = 2  # нолик (игрок - искуственный интелект)
 
     def __init__(self):
         self._size = 3
